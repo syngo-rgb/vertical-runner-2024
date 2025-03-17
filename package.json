@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "lts": "^2.0.0"
+  },
+  "devDependencies": {
+    "vite": "^6.2.2"
+  }
+}
