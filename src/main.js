@@ -1,6 +1,6 @@
 // main.js
-import Phaser from 'phaser';
-import gameOptions from '.src/utils/gameOptions.js';
+//import Phaser from 'phaser';
+import gameOptions from './utils/gameOptions.js';
 import { PreloadScene } from './scenes/Preload.js';
 import { MenuScene } from './scenes/Menu.js';
 import { GameScene } from './scenes/Game.js';
@@ -16,6 +16,7 @@ const config = {
             debug: false
         }
     },
+    pixelArt: true,
     scene: [PreloadScene, MenuScene, GameScene],
     parent: 'game-container'
 };
