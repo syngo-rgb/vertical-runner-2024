@@ -6,7 +6,7 @@ export class PreloadScene extends Phaser.Scene {
     preload() {
         this.load.image('fly', 'public/assets/fly.png');
         // this.load.image('obstacle', 'public/assets/obstacle.png');
-        this.load.image('background', 'public/assets/background.png');
+        //this.load.image('background', 'public/assets/background.png');
     }
 
     create() {
