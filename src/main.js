@@ -1,5 +1,6 @@
 // main.js
-import gameOptions from '/home/user/vertical-runner-2024/utils/gameOptions.js';
+import Phaser from 'phaser';
+import gameOptions from '.src/utils/gameOptions.js';
 import { PreloadScene } from './scenes/Preload.js';
 import { MenuScene } from './scenes/Menu.js';
 import { GameScene } from './scenes/Game.js';
@@ -8,6 +9,7 @@ const config = {
     type: Phaser.AUTO,
     width: gameOptions.width,
     height: gameOptions.height,
+    backgroundColor: '#232221',
     physics: {
         default: 'arcade',
         arcade: {
