@@ -18,7 +18,9 @@ export class PreloadScene extends Phaser.Scene {
         this.load.image('telaraña', 'public/assets/telarana.png');
 
         this.load.image('escenario', 'public/assets/escenario.png');     
-    
+        //this.game.renderer.pipelines.add('crt', new CRTPipeline(this.game));
+        this.load.audio('alarm', 'public/assets/audio/alarm.wav');
+        this.load.audio('backgroundMusic', 'public/assets/audio/age out 120.wav');
     }    
 
     create() {
