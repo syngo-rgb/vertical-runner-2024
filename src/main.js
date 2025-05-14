@@ -5,7 +5,7 @@ import gameOptions from './utils/gameOptions.js';
 import { PreloadScene } from './scenes/Preload.js';
 import { MenuScene } from './scenes/Menu.js';
 import { GameScene } from './scenes/Game.js';
-import CRTPipeline from './pipeline/crtPipeline.js';
+//import CRTPipeline from './pipeline/crtPipeline.js';
 
 const config = {
     type: Phaser.WEBGL,
@@ -25,4 +25,4 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
-game.renderer.addPipeline('crt', new CRTPipeline(game));
+//game.renderer.addPipeline('crt', new CRTPipeline(game));

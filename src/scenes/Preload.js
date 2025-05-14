@@ -4,9 +4,10 @@ export class PreloadScene extends Phaser.Scene {
     }
 
     preload() {
+        this.load.image('background', 'public/assets/escenario.png');
         this.load.spritesheet('fly', 'assets/fly.png', {
             frameWidth: 19,
-            frameHeight: 13
+            frameHeight: 20
         });
 
         // Obstacles
@@ -25,5 +26,6 @@ export class PreloadScene extends Phaser.Scene {
 
     create() {
         this.scene.start('Menu');
+                this.background = this.add.image(gameOptions.width / 2, 0, 'background').setOrigin(0.5, 0);
     }
 }

@@ -5,7 +5,7 @@ export class GameScene extends Phaser.Scene {
         super('Game');
         this.controlsInverted = false;
         this.isGameOver = false;
-        this.inversionTime = 10; // tiempo en segundos para invertir controles
+        this.inversionTime = 10;
 
         const savedBestTime = localStorage.getItem('bestTime');
         gameOptions.bestTime = savedBestTime ? parseFloat(savedBestTime) : 0;
@@ -14,24 +14,24 @@ export class GameScene extends Phaser.Scene {
     create() {
         this.controlsInverted = false;
         this.isGameOver = false;
+        this.backgrounds = [];
+
+        for (let i = 0; i < 2; i++) {
+            const bg = this.add.image(gameOptions.width / 2, i * 600, 'background').setOrigin(0.5, 0);
+            this.backgrounds.push(bg);
+        }
 
         // Animaciones
         this.anims.create({
             key: "fly-anim",
-            frames: this.anims.generateFrameNumbers("fly", {
-                start: 0,
-                end: 1
-            }),
+            frames: this.anims.generateFrameNumbers("fly", { start: 0, end: 1 }),
             frameRate: 19,
             repeat: -1
         });
 
         this.anims.create({
             key: "gas-anim",
-            frames: this.anims.generateFrameNumbers("gas", {
-                start: 0,
-                end: 6
-            }),
+            frames: this.anims.generateFrameNumbers("gas", { start: 0, end: 6 }),
             frameRate: 12,
             repeat: -1
         });
@@ -42,12 +42,7 @@ export class GameScene extends Phaser.Scene {
         this.player.setCollideWorldBounds(true);
         this.player.play("fly-anim", true);
 
-        this.obstacles = this.physics.add.group({
-            defaultKey: "obstacleSprite",
-            velocityY: 200,
-            collideWorldBounds: false,
-            immovable: true
-        });
+        this.obstacles = this.add.group(); // grupo sin físicas
 
         this.timerObstacule = this.time.addEvent({
             delay: 1000,
@@ -108,21 +103,41 @@ export class GameScene extends Phaser.Scene {
 
     update() {
         if (this.isGameOver) return;
-
+    
         const elapsedTime = (new Date() - this.startTime) / 1000;
         this.elapsedTime = elapsedTime;
-
-        // ⚠️ Aquí había un error de sintaxis en la interpolación
         this.timerText.setText(`Time: ${elapsedTime.toFixed(2)}s`);
-
+    
         const speed = 200;
-
-        this.obstacles.children.iterate(obstacle => {
-            if (obstacle && obstacle.y > 600) {
+        const minX = 47;
+        const maxX = 549;
+    
+        // Parallax background
+        this.backgrounds.forEach(bg => {
+            bg.y += gameOptions.scrollSpeed;
+            if (bg.y >= this.game.config.height) {
+                const otherBg = this.backgrounds.find(b => b !== bg);
+                bg.y = otherBg.y - bg.displayHeight + 1;
+            }
+        });
+    
+        // Movimiento y límite horizontal de obstáculos
+        this.obstacles.getChildren().forEach(obstacle => {
+            obstacle.y += gameOptions.scrollSpeed;
+    
+            // Limitar posición horizontal del obstáculo
+            if (obstacle.x < 275) {
+                obstacle.x = 275;
+            } else if (obstacle.x > 525) {
+                obstacle.x = 525;
+            }
+    
+            if (obstacle.y > 600) {
                 obstacle.destroy();
             }
         });
-
+    
+        // Controles
         if (this.controlsInverted) {
             if (this.cursors.left.isDown) {
                 this.player.setVelocityX(speed);
@@ -140,24 +155,45 @@ export class GameScene extends Phaser.Scene {
             } else {
                 this.player.setVelocityX(0);
             }
-            this.inversionText.setText("");
+            this.inversionText.setText('');
+        }
+    
+        // Limitar posición del jugador al área jugable
+        if (this.player.x < 275) {
+            this.player.x = 275;
+        } else if (this.player.x > 525) {
+            this.player.x = 525;
         }
     }
-
+    
     addObstacle() {
-        const random = Phaser.Math.Between(1, 2);
-        const obstacleType = (random === 1) ? "gas" : "telaraña";
+        const obstacleType = Phaser.Math.Between(1, 2) === 1 ? 'gas' : 'telaraña';
 
-        const obstacle = this.physics.add.sprite(Phaser.Math.Between(50, 750), -50, obstacleType).setScale(2);
-        this.obstacles.add(obstacle);
+        const minX = 47;
+        const maxX = 549;
 
-        obstacle.setVelocityY(200);
-        obstacle.setCollideWorldBounds(false);
+        const obstacle = this.physics.add.sprite(
+            Phaser.Math.Between(minX, maxX),
+            -50,
+            obstacleType
+        ).setScale(2);
+
+        obstacle.scrollSpeed = gameOptions.scrollSpeed;
         obstacle.setImmovable(true);
+        obstacle.setCollideWorldBounds(false);
 
-        if (random === 1) {
+        if (obstacleType === "gas") {
             obstacle.play("gas-anim", true);
+            obstacle.body.setSize(obstacle.width * 0.5, obstacle.height * 0.5);
+            obstacle.body.setOffset(obstacle.width * 0.25, obstacle.height * 0.25);
+        } else if (obstacleType === "telaraña") {
+            // Reducir área de colisión para la telaraña
+            obstacle.body.setSize(obstacle.width * 0.5, obstacle.height * 0.5);
+            obstacle.body.setOffset(obstacle.width * 0.25, obstacle.height * 0.25);
+    
         }
+
+        this.obstacles.add(obstacle);
     }
 
     gameOver() {
@@ -170,9 +206,7 @@ export class GameScene extends Phaser.Scene {
         gameOptions.bestTime = Math.max(gameOptions.bestTime, currentTime);
         localStorage.setItem('bestTime', gameOptions.bestTime);
 
-        const overlay = this.add.rectangle(400, 300, 800, 600, 0x000000)
-            .setAlpha(0.6)
-            .setDepth(10);
+        const overlay = this.add.rectangle(400, 300, 800, 600, 0x000000).setAlpha(0.6).setDepth(10);
 
         const gameOverText = this.add.text(400, 200, 'GAME OVER', {
             fontFamily: '"Press Start 2P"',
